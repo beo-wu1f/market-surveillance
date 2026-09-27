@@ -847,6 +847,11 @@ VISUALIZE
 Author
 
 Rishi Kant
+
 https://github.com/beo-wu1f
 
 Built as a practical data engineering and business intelligence project.
+
+  <br><br>
+  ⭐ If you enjoyed the project, consider giving it a star!
+</p>
