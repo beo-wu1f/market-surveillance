@@ -33,7 +33,7 @@ Data Quality Validation
 Market Analysis
      ↓
 Power BI Dashboard
-
+```
 ---
 
 ## Architecture
@@ -92,7 +92,7 @@ For example:
 
 ```text
 Cycle result: 4 saved | 0 failed
-
+```
 This approach allows the pipeline to retain successful observations even when an individual API request encounters a temporary problem.
 
 Collector Implementation
@@ -101,6 +101,11 @@ The main collection logic is contained in:
 src/collector.py
 
 The collector writes successful observations directly into the SQLite database, creating a persistent record of the monitoring period.
+
+Below is a screenshot of the collector demo while running. The collector was not re-run for this capture to prevent inserting additional test rows into the database.
+
+
+![collector_demo](images/collector.png)
 
 ## Data Storage
 
@@ -149,7 +154,7 @@ The validation logic is contained in:
 
 ```text
 src/clean.py
-
+```
 The purpose of clean.py is to inspect the collected data and identify potential problems before the data is used for analysis or visualization.
 
 Quality Checks
@@ -192,6 +197,11 @@ DATA LOOKS CLEAN
 
 This validation step creates a clear boundary between data collection and data analysis, reducing the risk of analyzing corrupted or inconsistent observations.
 
+Below is the terminal output from clean.py executing the automated data quality check:
+
+
+![clean script running](images/clean.png)
+
 ---
 
 ---
@@ -204,7 +214,7 @@ The analytical logic is contained in:
 
 ```text
 src/analyze.py
-
+```
 The script processes the collected observations for each stock and calculates a set of descriptive market metrics.
 
 Metrics Calculated
@@ -228,31 +238,19 @@ Return Calculation
 
 The period return measures the change between the first and last observed prices:
 
-Period Return =
-(Ending Price - Starting Price)
-───────────────────────────────
-       Starting Price
+Period Return = (Ending Price − Starting Price) / Starting Price
 
-Volatility
+Return = (Current Price − Previous Price) / Previous Price
 
-Return volatility is calculated from the consecutive price returns observed during the monitoring period.
-
-For each observation:
-
-Return =
-(Current Price - Previous Price)
-────────────────────────────────
-        Previous Price
-
-        The standard deviation of these consecutive returns is then used as the observed return volatility.
+The standard deviation of these consecutive returns is then used as the observed return volatility.
 
 This volatility measure describes price variation during the collected observation period and is not annualized.
 
 Analysis Run
 
-The complete analytical output can be seen below.
+Below is a screenshot of analyze.py generating market surveillance and volatility metrics for the monitored assets
 
-Terminal output from python src/analyze.py.
+![Description of image](images/analysis.png)
 
 ---
 
@@ -355,9 +353,13 @@ Because the stocks have very different absolute prices, their prices are normali
 ```text
 Starting Price = 100
 
+```
+
 Each subsequent observation is expressed relative to that starting point.
 
 Power BI — Relative Performance page.
+
+![Price Movement](images/powerbi_relative.png)
 
 This makes it possible to compare the direction and magnitude of movement across stocks without the different dollar price levels dominating the visualization.
 
@@ -396,9 +398,11 @@ Several DAX measures were created to reproduce the Python analysis inside Power 
 ```DAX
 Total Observations =
 COUNTROWS(market_quotes)
+```
 
 Counts the number of market observations currently visible in the report context.
 
+```
 Starting Price
 
 Starting Price =
@@ -409,11 +413,11 @@ RETURN
         MAX(market_quotes[price]),
         market_quotes[timestamp] = FirstTimestamp
     )
-
+```
 Returns the first observed price within the current filter context.
 
 Ending Price
-
+```
 Ending Price =
 VAR LastTimestamp =
     MAX(market_quotes[timestamp])
@@ -422,22 +426,22 @@ RETURN
         MAX(market_quotes[price]),
         market_quotes[timestamp] = LastTimestamp
     )
-
+```
 Returns the final observed price within the current filter context.
 
 Period Return
-
+```
 Period Return =
 DIVIDE(
     [Ending Price] - [Starting Price],
     [Starting Price]
 )
-
+```
 Price Change
-
+```
 Price Change =
 [Ending Price] - [Starting Price]
-
+```
 Calculates the absolute price difference between the beginning and end of the observation period.
 
 Return Volatility
@@ -533,7 +537,7 @@ Market-Surveillance/
 ├── .env
 ├── .gitignore
 └── README.md
-
+```
 Directory Roles
 
 | Directory / File   | Purpose                                     |
@@ -606,19 +610,19 @@ Collection + Validation + Analysis
 
 Power BI
 Interactive Analysis + Visualization
-
+```
 This also allows the analytical calculations to be reproduced interactively through DAX.
 
 Why Separate Collection, Validation, and Analysis?
 
 The project deliberately separates these responsibilities into different scripts:
-
+```
 collector.py
      ↓
 clean.py
      ↓
 analyze.py
-
+```
 This separation makes the pipeline easier to understand, debug, and extend.
 
 For example, a data-quality problem can be investigated independently without modifying the collection logic.
@@ -642,9 +646,9 @@ The objective was to demonstrate a complete working data pipeline rather than in
 Technologies such as Kafka, Spark, or Airflow could become appropriate in a larger production system with higher data volumes, more complex orchestration requirements, or multiple downstream consumers.
 
 For this project, the simpler architecture keeps the focus on the core workflow:
-
+```
 Collect → Store → Validate → Analyze → Visualize
-
+```
 ---
 
 ## Limitations
@@ -670,12 +674,12 @@ The results should not be interpreted as representative of the stocks' performan
 ### Small Dataset
 
 The dataset contains 515 observations across four stocks:
-
+```
 - AAPL
 - AMZN
 - MSFT
 - NVDA
-
+```
 This is sufficient for demonstrating the pipeline and Power BI analysis, but it is not large enough to demonstrate the performance characteristics of a production-scale data platform.
 
 ### SQLite Storage
@@ -730,13 +734,13 @@ Healthcare
 Finance
 Consumer
 Energy
-
+```
 This would make sector-level comparisons possible.
 
 Longer Historical Dataset
 
 With access to an appropriate historical market-data source, the project could be extended to analyze:
-
+```
 Daily returns
 Long-term volatility
 Drawdowns
@@ -744,19 +748,19 @@ Rolling volatility
 Moving averages
 Correlations between stocks
 Automated Power BI Refresh
-
-A production-oriented version could connect the dashboard to a hosted data source and automatically refresh the analytical model after each successful pipeline run.
+```
+production-oriented version could connect the dashboard to a hosted data source and automatically refresh the analytical model after each successful pipeline run.
 
 Additional Data Sources
 
 The project could eventually combine market prices with other financial datasets such as:
-
+```
 Company fundamentals
 Earnings
 Financial statements
 Economic indicators
 Sector information
-
+```
 This would transform the project from a market-monitoring pipeline into a broader financial analytics platform.
 
 ---
@@ -781,11 +785,11 @@ Python Analysis
 Power BI Data Model
      ↓
 Interactive Dashboard
-
+```
 The project successfully collected and validated 515 market observations across four stocks and transformed them into a three-page Power BI dashboard.
 
 The project is intentionally complete in its current form rather than being extended indefinitely. Future improvements are documented above as potential directions rather than unfinished requirements.
-
+```
 Technologies Used
 Data Collection & Processing
 Python
@@ -810,11 +814,11 @@ Git
 GitHub
 Visual Studio Code
 Python virtual environment
-
+```
 Key Skills Demonstrated
 
 This project demonstrates practical experience with:
-
+```
 API-based data ingestion
 Relational database design
 SQL querying
@@ -827,9 +831,9 @@ DAX measure development
 Power BI data modeling
 Interactive dashboard design
 Git/GitHub project organization
-
+```
 The project also demonstrates the separation of responsibilities across a data workflow:
-
+```
 INGEST
   ↓
 STORE
@@ -839,9 +843,10 @@ VALIDATE
 ANALYZE
   ↓
 VISUALIZE
-
+```
 Author
 
-beo-wu1f (Rishi Kant)
+Rishi Kant
+https://github.com/beo-wu1f
 
 Built as a practical data engineering and business intelligence project.
