@@ -789,8 +789,10 @@ Interactive Dashboard
 The project successfully collected and validated 515 market observations across four stocks and transformed them into a three-page Power BI dashboard.
 
 The project is intentionally complete in its current form rather than being extended indefinitely. Future improvements are documented above as potential directions rather than unfinished requirements.
+
+Technologies used
+
 ```
-Technologies Used
 Data Collection & Processing
 Python
 Finnhub API
